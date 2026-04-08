@@ -17,6 +17,10 @@
 
 **https://datawhalechina.github.io/reasoning-kingdom**
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=datawhalechina/reasoning-kingdom&type=Date)](https://star-history.com/#datawhalechina/reasoning-kingdom&Date)
+
 ## 两卷结构
 
 本书分上下两卷，阅读路径不同，可以分开进入。
