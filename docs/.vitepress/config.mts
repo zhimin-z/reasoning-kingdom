@@ -72,7 +72,6 @@ export default defineConfig({
         {
           text: '前传：推理科学入门',
           items: [
-            { text: '首页', link: '/dear-reasoner/' },
             { text: '前言', link: '/dear-reasoner/preface' },
             {
               text: '第一部分：确定性的宇宙',
@@ -177,8 +176,8 @@ export default defineConfig({
              { text: '导读', link: '/volume1/preface/' },
              { text: '前传：推理科学入门 →', link: '/dear-reasoner/preface' },
              { text: '兔狲教授小词典', link: '/dictionary' },
-            { text: '上卷：推理的历史叙事 →', link: '/volume1/chapter1/' },
-            { text: '下卷：推理的形式演绎 →', link: '/volume2/chapter14/' },
+            { text: '上卷：推理的历史叙事 →', link: '/volume1/preface/' },
+            { text: '下卷：推理的形式演绎 →', link: '/volume2/preface/' },
           ]
         }
       ]

@@ -87,6 +87,7 @@
 
 | 章节名 | 简介 | 状态 |
 | :--- | :--- | :--- |
+| [前言](https://datawhalechina.github.io/reasoning-kingdom/dear-reasoner/preface) | 推理科学民主化 | ✅ |
 | **第一部分：确定性的宇宙** | **第1-7章** | **7章** |
 | [第1章：电报、手电筒与逻辑的起点](https://datawhalechina.github.io/reasoning-kingdom/dear-reasoner/volume1/chapter1/) | 布尔逻辑：所有推理的起点 | ✅ |
 | [第2章：当资源有了边界（复杂度）](https://datawhalechina.github.io/reasoning-kingdom/dear-reasoner/volume1/chapter2/) | 时间与空间复杂度：推理的代价 | ✅ |
@@ -205,11 +206,6 @@ npm run docs:build
 **预览构建结果**：
 ```bash
 npm run docs:preview
-```
-
-**生成正交计算图**（前传专用）：
-```bash
-python3 scripts/generate_figures.py
 ```
 
 ## 加入内测群
