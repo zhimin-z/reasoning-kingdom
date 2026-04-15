@@ -140,7 +140,7 @@ $$v^* = \arg\min_v \sum_j \left(\|E_{\text{next}}[j]\| - y^*_j\right)^2$$
 
 CausalSearch 把推理王国自身的章节作为因果知识图谱，用 Pearl 三步法（溯因→行动→预测）做检索，持续发现向量 RAG 遗漏的跨章因果链。
 
-`→ [github.com/lizixi-0x2F/CocDo](https://github.com/lizixi-0x2F/CocDo)` &nbsp; `→ [因果推断番外篇](/volume2/chapterbonous/)`
+`→ [github.com/lizixi-0x2F/CocDo](https://github.com/lizixi-0x2F/CocDo)` &nbsp; `→ [因果推断番外篇](/volume1/chapterbonous/)`
 
 ---
 
