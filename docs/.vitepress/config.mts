@@ -115,11 +115,54 @@ export default defineConfig({
             {
               text: '兔狲学院',
               items: [
-                { text: '开学导论课：给还没有上大学的小伙伴', link: '/dear-reasoner/academy/' },
+                { text: '学院主页：推理科学家的思维实验室', link: '/dear-reasoner/academy/' },
+                {
+                  text: '数学基础综合：从自然数到不动点理论',
+                  link: '/dear-reasoner/academy/mathematics/',
+                  items: [
+                    { text: '自然数与公理系统', link: '/dear-reasoner/academy/mathematics/foundations/natural-numbers.md' },
+                    { text: '集合论基础', link: '/dear-reasoner/academy/mathematics/foundations/set-theory.md' },
+                    { text: '逻辑与证明方法', link: '/dear-reasoner/academy/mathematics/foundations/logic.md' },
+                    { text: '函数与关系', link: '/dear-reasoner/academy/mathematics/foundations/functions.md' },
+                    { text: '数列与极限', link: '/dear-reasoner/academy/mathematics/foundations/sequences.md' },
+                    { text: 'ZFC集合论', link: '/dear-reasoner/academy/mathematics/foundations/zfc.md' },
+                    { text: '不动点理论', link: '/dear-reasoner/academy/mathematics/foundations/fixed-points.md' },
+                  ]
+                },
+                {
+                  text: 'AI数学基础：概率统计到线性模型',
+                  link: '/dear-reasoner/academy/mathematics/ai-mathematics/',
+                  items: [
+                    { text: '概率论基础', link: '/dear-reasoner/academy/mathematics/ai-mathematics/probability.md' },
+                    { text: '统计学基础', link: '/dear-reasoner/academy/mathematics/ai-mathematics/statistics.md' },
+                    { text: '优化理论', link: '/dear-reasoner/academy/mathematics/ai-mathematics/optimization.md' },
+                    { text: '信息论', link: '/dear-reasoner/academy/mathematics/ai-mathematics/information-theory.md' },
+                    { text: '线性模型', link: '/dear-reasoner/academy/mathematics/ai-mathematics/linear-models.md' },
+                  ]
+                },
+                {
+                  text: '哲学：从古希腊到1840年',
+                  link: '/dear-reasoner/academy/philosophy/',
+                  items: [
+                    { text: '古希腊哲学', link: '/dear-reasoner/academy/philosophy/sections/ancient-greek.md' },
+                    { text: '文艺复兴哲学', link: '/dear-reasoner/academy/philosophy/sections/renaissance.md' },
+                    { text: '德国古典哲学', link: '/dear-reasoner/academy/philosophy/sections/german-idealism.md' },
+                    { text: '马克思与恩格斯', link: '/dear-reasoner/academy/philosophy/sections/marx-engels.md' },
+                    { text: '企望新哲学', link: '/dear-reasoner/academy/philosophy/sections/future.md' },
+                  ]
+                },
+                {
+                  text: 'Python编程：从语法到数据结构',
+                  link: '/dear-reasoner/academy/python/',
+                  items: [
+                    { text: 'Python基础语法', link: '/dear-reasoner/academy/python/sections/basics.md' },
+                    { text: '数据结构', link: '/dear-reasoner/academy/python/sections/data_structures.md' },
+                    { text: '算法设计', link: '/dear-reasoner/academy/python/sections/algorithms.md' },
+                    { text: '高级应用', link: '/dear-reasoner/academy/python/sections/advanced.md' },
+                  ]
+                },
                 { text: '微积分：从函数到微分方程', link: '/dear-reasoner/academy/calculus/' },
                 { text: '线性代数：从向量到雅可比矩阵', link: '/dear-reasoner/academy/linear-algebra/' },
-                { text: '哲学：从古希腊到1840年', link: '/dear-reasoner/academy/philosophy/' },
-                { text: 'Python编程：从语法到数据结构', link: '/dear-reasoner/academy/python/' },
               ]
             }
           ]
