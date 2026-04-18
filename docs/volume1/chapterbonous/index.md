@@ -98,6 +98,7 @@ bad_edge = Pi("Y", Sort(1), Sort(0))  # type_of 会拒绝这个
 在 λ 演算里，这个操作有一个精确的名字：**捕获避免替换**（capture-avoiding substitution），记作 $[v/X]M$——把项 $M$ 里所有自由出现的变量 $X$ 替换为 $v$。
 
 :::details β-归约和捕获避免替换：$\lambda$-演算的两个核心操作
+
 **β-归约（Beta Reduction）**是 $\lambda$-演算的核心计算规则：
 
 $$(\lambda x.\, M)\, N \;\to\; [N/x]M$$
