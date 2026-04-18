@@ -13,7 +13,6 @@ import { h } from 'vue';
 
 // 公告栏组件
 const Announcement = () => h('div', {
-    class: 'announcement-banner',
 })
 
 export default {
