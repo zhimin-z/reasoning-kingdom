@@ -265,14 +265,14 @@ $$
 真正的操作发生在**隐藏空间**（hidden space）。
 
 当序列 $X$ 进入Transformer时，它首先变成：
-$$ X_{\\text{hidden}} = \\text{LayerNorm}(X_{\\text{embed}} + \\text{PositionalEncoding}) $$
+$$ X_{\text{hidden}} = \text{LayerNorm}(X_{\text{embed}} + \text{PositionalEncoding}) $$
 
 位置编码、层归一化……这些都不是装饰。它们把静态的嵌入**转化为上下文相关的隐藏表示**。
 
 然后注意力才登场：
-$$ \\text{Attention}(Q,K,V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V $$
+$$ \text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$
 
-注意： $Q = X_{\\text{hidden}} W_Q, K = X_{\\text{hidden}} W_K, V = X_{\\text{hidden}} W_V$。
+注意： $Q = X_{\text{hidden}} W_Q, K = X_{\text{hidden}} W_K, V = X_{\text{hidden}} W_V$。
 
 **$Q,K,V$ 是隐藏表示的投影，不是token本身的投影。**
 
@@ -291,7 +291,7 @@ $$ \\text{Attention}(Q,K,V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\r
 $q_i$ 是一个查询：”在当前的上下文理解下，我需要什么信息？”  
 $k_j$ 是一个索引：”在当前的上下文理解下，我提供了什么信息？”
 
-相似度 $q_i \\cdot k_j$ 衡量的是两个**上下文理解**之间的匹配程度，不是两个**词**之间的匹配程度。
+相似度 $q_i \cdot k_j$ 衡量的是两个**上下文理解**之间的匹配程度，不是两个**词**之间的匹配程度。
 
 ### RNN的硬性瓶颈 vs Transformer的动态拓扑
 
@@ -309,7 +309,7 @@ $$ h_t = f(h_{t-1}, x_t) $$
 **Transformer：隐藏空间的动态拓扑**
 
 - 每个隐藏表示 $h_i$ 通过QKV投影生成 $q_i, k_i, v_i$  
-- 注意力权重 $\\alpha_{ij}$ 实时计算，形成**动态的连接图**  
+- 注意力权重 $\alpha_{ij}$ 实时计算，形成**动态的连接图**  
 - 没有固定维度的瓶颈——信息容量与序列长度成正比  
 - **高熵结构**：连接权重动态生成，表达自由度极高
 
@@ -317,8 +317,8 @@ $$ h_t = f(h_{t-1}, x_t) $$
 
 让我用量化一点的术语：
 
-- RNN表征自由度：$O(d_{\\text{hidden}})$，与序列长度无关  
-- 注意力表征自由度：$O(N \\times d_{\\text{model}})$，随序列长度线性增长
+- RNN表征自由度：$O(d_{\text{hidden}})$，与序列长度无关  
+- 注意力表征自由度：$O(N \times d_{\text{model}})$，随序列长度线性增长
 
 但注意力不仅仅是“更多存储”。它的高熵来源于**动态选择性**。
 
@@ -376,7 +376,7 @@ Transformer不是一个扁平的结构，而是一个**金字塔**：
 
 这就是为什么**深度**如此重要。
 
-在同样的宽度（$d_{\\text{model}}$）下：
+在同样的宽度（$d_{\text{model}}$）下：
 - 浅层网络：信息交合路径短，只能做局部或浅层的模式匹配
 - 深层网络：信息可以在隐藏空间中“旅行”更远，实现跨多个抽象层次的整合
 
