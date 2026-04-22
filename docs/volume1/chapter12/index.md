@@ -1230,7 +1230,6 @@ class ADSOptimizer(Optimizer):
       alpha(B_t) = -log(1 - B_t)
       B_t = H(p_t) / H_max
 
-    可选动量（类似 SGD with momentum），
     但步长由信息论量驱动，不依赖梯度二阶矩（这是与 Adam 的根本区别）。
 
     用法：
@@ -1288,7 +1287,6 @@ class ADSOptimizer(Optimizer):
 
         for group in self.param_groups:
             lr = group['lr']
-            momentum = group['momentum']
             weight_decay = group['weight_decay']
 
             # 核心：熵感知有效步长
