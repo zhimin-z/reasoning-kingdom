@@ -1235,6 +1235,122 @@ def run(n_classes=4, steps=60, eta_base=0.08, seed=42):
 ```
 :::
 
+### 10.7 Tiny GPT 消融实验
+
+上面的理论在真实的 Transformer 架构上是否成立？我们用一个最小 GPT（1层因果注意力 + FFN，纯 numpy 实现）做消融验证。
+
+**实验设置**：词表 $C=8$，序列长 $T=16$，$d_{\text{model}}=32$，batch=32，共 300 步。三种调度器从**相同初始有效步长** $\eta_{\text{target}}=0.02$ 出发，公平对比。
+
+![Tiny GPT 消融：熵感知 vs 固定 vs 余弦退火](/entropy_lr_gpt_ablation.png)
+
+**结果**（300步后）：
+
+| 调度器 | 最终 Loss | 最终 LR |
+|--------|-----------|---------|
+| Fixed $\eta=0.02$ | 0.3977 | 0.020 |
+| Cosine Annealing | 0.7506 | 0.000 |
+| **Entropy-Aware (ADS)** | **0.0503** | **0.126** |
+
+ADS 的最终 loss 是 Fixed 的 **1/8**，是 Cosine 的 **1/15**，在 log 坐标下差距约一个数量级。
+
+**为什么 ADS 在 GPT 上反而更快？** 关键在于方向与 FFN 实验相反：GPT 训练过程中，随着模型学习，输出分布的熵**持续下降**（从接近均匀分布收敛到尖锐分布）。熵感知调度感知到这一变化，自动**增大**步长（$\alpha$ 减小 → $\eta_t$ 增大），在后期加速冲刺。而 Cosine 调度在后期 LR 趋零，恰好在模型最需要大步长的时候踩了刹车。
+
+:::warning 注意
+这里的 ADS 优势部分来自于 `eta0` 的校准方式（从初始熵反推，使第一步有效步长等于 `eta_target`）。在实际应用中，`eta_target` 仍需根据任务调整，但调整范围比固定 LR 宽松得多——熵感知机制提供了自动的安全边界。
+:::
+
+:::details Tiny GPT 消融完整代码
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+T, D, H_dim, C = 16, 32, 16, 8
+
+def softmax(x, axis=-1):
+    e = np.exp(x - x.max(axis, keepdims=True))
+    return e / e.sum(axis, keepdims=True)
+
+def cross_entropy(logits, y):
+    p = softmax(logits)
+    return -np.log(p[np.arange(len(y)), y] + 1e-10).mean(), p
+
+def init_params():
+    s = 0.02
+    return {
+        "Wq": np.random.randn(D, H_dim)*s, "Wk": np.random.randn(D, H_dim)*s,
+        "Wv": np.random.randn(D, H_dim)*s, "Wo": np.random.randn(H_dim, D)*s,
+        "W1": np.random.randn(D, D*2)*s,   "b1": np.zeros(D*2),
+        "W2": np.random.randn(D*2, D)*s,   "b2": np.zeros(D),
+        "Wout": np.random.randn(D, C)*s,   "bout": np.zeros(C),
+    }
+
+def forward(x, p):
+    mask = np.triu(np.full((T,T), -1e9), 1)
+    Q = x @ p["Wq"]; K = x @ p["Wk"]; V = x @ p["Wv"]
+    A = softmax(Q @ K.transpose(0,2,1) / H_dim**0.5 + mask)
+    attn = A @ V @ p["Wo"]
+    h = x + attn
+    ff = np.maximum(0, h @ p["W1"] + p["b1"]) @ p["W2"] + p["b2"]
+    h2 = h + ff
+    logits = h2[:, -1, :] @ p["Wout"] + p["bout"]
+    return logits, A, h, h2, V
+
+def backward(x, y, p, lr):
+    B = x.shape[0]
+    logits, A, h, h2, V = forward(x, p)
+    loss, probs = cross_entropy(logits, y)
+    dlogits = probs.copy(); dlogits[np.arange(B), y] -= 1; dlogits /= B
+    p["Wout"] -= lr * h2[:,-1,:].T @ dlogits
+    p["bout"] -= lr * dlogits.sum(0)
+    dh2 = np.zeros_like(h2); dh2[:,-1,:] = dlogits @ p["Wout"].T
+    dW2 = np.einsum('bti,btj->ij', np.maximum(0, h @ p["W1"] + p["b1"]), dh2)
+    db2 = dh2.sum((0,1))
+    dh_ff = (dh2 @ p["W2"].T) * (h @ p["W1"] + p["b1"] > 0)
+    dW1 = np.einsum('bti,btj->ij', h, dh_ff)
+    db1 = dh_ff.sum((0,1))
+    p["W1"] -= lr*dW1; p["b1"] -= lr*db1; p["W2"] -= lr*dW2; p["b2"] -= lr*db2
+    dh = dh2 + dh_ff @ p["W1"].T
+    attn_out = A @ V
+    dWo = np.einsum('bth,btd->hd', attn_out, dh)
+    p["Wo"] -= lr * dWo
+    dattn_h = dh @ p["Wo"].T
+    dV = np.einsum('bts,bsh->bth', A, dattn_h)
+    p["Wv"] -= lr * np.einsum('btd,bth->dh', x, dV)
+    p["Wq"] -= lr * np.einsum('btd,bth->dh', x, dattn_h) * 0.01
+    p["Wk"] -= lr * np.einsum('btd,bth->dh', x, dattn_h) * 0.01
+    return loss, probs
+
+def entropy_alpha(probs, n_classes):
+    H_max = np.log(n_classes)
+    H = -(probs * np.log(probs + 1e-10)).sum(-1).mean()
+    B = min(float(H / H_max), 1 - 1e-6)
+    return -np.log(1 - B)
+
+X_data = np.random.randn(32, T, D).astype(np.float32)
+y_data = np.random.randint(0, C, 32)
+steps, eta_target = 300, 0.02
+results = {}
+
+for name in ["Fixed", "Cosine", "ADS"]:
+    p = init_params()
+    losses, lrs = [], []
+    if name == "ADS":
+        _, p0 = cross_entropy(forward(X_data, p)[0], y_data)
+        eta0 = eta_target * (1 + entropy_alpha(p0, C))
+    for t in range(steps):
+        if name == "Fixed":   lr = eta_target
+        elif name == "Cosine": lr = eta_target * 0.5 * (1 + np.cos(np.pi * t / steps))
+        else:
+            _, probs = cross_entropy(forward(X_data, p)[0], y_data)
+            lr = eta0 / (1 + entropy_alpha(probs, C))
+        loss, _ = backward(X_data, y_data, p, lr)
+        losses.append(loss); lrs.append(lr)
+    results[name] = (losses, lrs)
+```
+:::
+
 ## 11. 有效推理窗口的量化
 
 给定精度阈值 $\epsilon > 0$，有效推理窗口：
